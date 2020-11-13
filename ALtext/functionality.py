@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets	
 from UI import Ui_MainWindow
 from autocomplete import MyTextEdit
+from startup import welcome_tab
 import os
 
 class Functionality(Ui_MainWindow):
@@ -23,7 +24,9 @@ class Functionality(Ui_MainWindow):
 		self.tabWidget.tabCloseRequested.connect(self.close_tab)
 		self.tabWidget.setCurrentIndex(0)	
 
-	def open_file(self, _, selected_files=[]):
+		self.default_screen()
+
+	def open_file(self, _="", selected_files=[]):
 		try:
 			if selected_files == []:
 				selected_files = QtWidgets.QFileDialog.getOpenFileNames()[0]
@@ -33,6 +36,8 @@ class Functionality(Ui_MainWindow):
 					text = f.read()
 				self.new_tab(selected_files[index].split("/")[-1],selected_files[index].split("/")[-1])
 				self.editors[len(self.editors)-1].setPlainText(text)
+
+			self.tabWidget.setCurrentIndex(len(self.opened_files)-1)
 		except IndexError:
 			print("error")
 
@@ -58,7 +63,6 @@ class Functionality(Ui_MainWindow):
 				print("an error occured ({0})".format(e))
 	def new_tab(self, tab_name, fileName="none"):
 		tab = QtWidgets.QWidget()
-		tab.setObjectName("tab")
 		self.tabWidget.addTab(tab, tab_name)
 		
 		syn = ""
@@ -83,13 +87,25 @@ class Functionality(Ui_MainWindow):
 		
 	def close_tab(self, index):
 		self.editors.pop(index)
-		if self.opened_files != []: self.opened_files.pop(index)
+		self.opened_files.pop(index)
+			
 		self.tabWidget.removeTab(index)
-		print(self.opened_files)
 
 	def new_file(self):
 		self.new_tab("new tab")
 		self.opened_files.append("untitled")
+		self.tabWidget.setCurrentIndex(len(self.opened_files)-1)
+
+	def default_screen(self):
+		tab = QtWidgets.QWidget()
+		self.tabWidget.addTab(tab, "ALtext")
+		self.editors.append(None)
+		self.opened_files.append(None)
+		l = welcome_tab(tab)
+
+		l.dir.connect(self.open_dir)
+		l.file.connect(self.open_file)
+		l.new.connect(self.new_file)
 
 	def findAction(self):
 		extra = []
