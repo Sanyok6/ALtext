@@ -9,7 +9,6 @@ class welcome_tab(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self,*args)
         
         dementions = self.parent().frameGeometry()
-        print(dementions)
         
         l = QtWidgets.QLabel(self)
         l.resize(2+dementions.width()/3, 2+dementions.height()/3)
